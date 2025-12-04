@@ -1,28 +1,23 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
-import Root from "../pages/Root";
-import Home from "../pages/Home";
-import Login from "../pages/Login";
-import SignUp from "../pages/SignUp";
+// src/routes/Routes.jsx
+import React from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Root from "../pages/Root.jsx";
+import Home from "../pages/Home.jsx";
+import Login from "../pages/Login.jsx";
+import SignUp from "../pages/SignUp.jsx";
 
-export const routes = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/",
-    Component: Root,
-    errorElement: <Error />,
-
+    element: <Root />,
     children: [
-      {
-        path: "/",
-        Component: Home,
-      },
-      {
-        path: "/login",
-        Component: Login,
-      },
-      {
-        path: "/signup",
-        Component: SignUp,
-      },
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "signup", element: <SignUp /> },
     ],
   },
 ]);
+
+export default function Routes() {
+  return <RouterProvider router={router} />;
+}
