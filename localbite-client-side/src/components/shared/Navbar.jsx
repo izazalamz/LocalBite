@@ -30,10 +30,10 @@ export default function Navbar() {
               Home
             </NavLink>
             <a href="#how-it-works" className={linkBase}>
-              How it works
+              About
             </a>
             <a href="#why-localbite" className={linkBase}>
-              Why LocalBite
+              All Foods
             </a>
           </nav>
 
