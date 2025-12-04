@@ -40,12 +40,23 @@ const WhyCard = ({ icon, title, children }) => (
 export default function Home() {
   return (
     <>
+    <section className="bg-gradient-to-b from-white via-background to-background/80">
+      <div className="mx-auto max-w-6xl rounded-[2rem] bg-white/70 px-4 pb-16 pt-10 shadow-soft-lg backdrop-blur-sm sm:px-8 sm:pb-20 sm:pt-12 lg:mt-8"></div>
       {/* Hero */}
       <section className="bg-surface">
         <div className="mx-auto flex max-w-6xl flex-col gap-16 px-4 pb-20 pt-16 sm:px-6 sm:pb-24 sm:pt-20 lg:flex-row lg:items-center lg:gap-20 lg:pb-28 lg:pt-24">
           {/* Left */}
           <div className="flex flex-1 flex-col gap-8">
             <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-primary-green">
+  <span className="h-1.5 w-1.5 rounded-full bg-primary-green" />
+  Fresh homemade meals near you
+</div>
+
+<h1 className="mt-4 text-4xl sm:text-5xl lg:text-6xl ...">
+  Share Meals. <br /> …
+</h1>
+
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground">
                 Share Meals.
                 <br />
@@ -171,6 +182,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+    </section>
+      
     </>
   );
 }
