@@ -1,61 +1,102 @@
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: false;
+}
 
-/* Design tokens for Tailwind v4 */
 @theme {
-  /* Font */
-  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Background & Text */
+  --color-background: rgb(249 250 251); /* off-white */
+  --color-foreground: rgb(17 24 39); /* gray-900 */
 
-  /* Background & text */
-  --color-background: rgb(249 250 251);
-  /* #F9FAFB */
-  --color-foreground: rgb(15 23 42);
-  /* #0F172A */
+  /* Primary Colors (Fresh Green) */
+  --color-primary: rgb(76 175 80); /* #4CAF50 */
+  --color-primary-foreground: rgb(255 255 255);
+  --color-primary-hover: rgb(56 142 60); /* darker green */
 
-  /* Surface colors */
-  --color-surface: rgb(255 255 255);
-  /* white */
-  --color-surface-muted: rgb(243 244 246);
-  /* gray-100 */
+  /* Secondary Colors (Warm Orange) */
+  --color-secondary: rgb(255 140 66); /* #FF8C42 */
+  --color-secondary-foreground: rgb(255 255 255);
+  --color-secondary-hover: rgb(230 112 40);
 
-  /* Primary (buttons, accents) */
-  --color-primary-green: rgb(34 197 94);
-  /* #22C55E */
-  --color-primary-green-hover: rgb(22 163 74);
-  /* darker */
+  /* Accent (Deep Forest Green) */
+  --color-accent: rgb(27 67 50); /* #1B4332 */
+  --color-accent-foreground: rgb(255 255 255);
+  --color-accent-hover: rgb(22 56 42);
 
-  /* Secondary / accent */
-  --color-secondary-orange: rgb(248 113 113);
-  /* tweak if needed */
-  --color-secondary-orange-hover: rgb(239 68 68);
+  /* Neutral / Muted */
+  --color-neutral: rgb(31 41 55); /* gray-800 */
+  --color-neutral-foreground: rgb(255 255 255);
+  --color-muted: rgb(243 244 246); /* gray-100 */
+  --color-muted-foreground: rgb(107 114 128); /* gray-500 */
 
-  /* Deep accent (CTA background) */
-  --color-deep-accent-green: rgb(20 83 45);
-  /* #14532D */
+  /* Status Colors */
+  --color-success: rgb(34 197 94); /* green-500 */
+  --color-warning: rgb(255 159 28); /* soft amber */
+  --color-error: rgb(231 76 60); /* soft red */
+  --color-info: rgb(59 130 246); /* blue-500 */
 
-  /* Neutral text */
-  --color-muted: rgb(100 116 139);
-  /* gray-500 */
-  --color-muted-soft: rgb(148 163 184);
-  /* gray-400 */
+  /* Gradient for hero sections */
+  --gradient-hero: linear-gradient(135deg, rgb(76 175 80), rgb(27 67 50));
 
-  /* Shadows */
-  --shadow-soft: 0 15px 30px rgba(15, 23, 42, 0.06);
-  --shadow-soft-lg: 0 22px 45px rgba(15, 23, 42, 0.12);
+  /* Borders & Inputs */
+  --color-border: rgb(229 231 235);
+  --color-input: rgb(229 231 235);
+  --color-ring: rgb(76 175 80);
 
-  /* Radius */
-  --radius-card: 1.5rem;
-  /* rounded-3xl look */
+  /* Cards & Popovers */
+  --color-card: rgb(255 255 255);
+  --color-card-foreground: rgb(17 24 39);
+  --color-popover: rgb(255 255 255);
+  --color-popover-foreground: rgb(17 24 39);
 }
 
-/* Base */
-html {
-  -webkit-font-smoothing: antialiased;
+/* Dark Mode */
+.dark {
+  --color-background: rgb(17 24 39); /* gray-900 */
+  --color-foreground: rgb(243 244 246); /* gray-100 */
+
+  /* Primary Colors (Lighter Green) */
+  --color-primary: rgb(129 199 132);
+  --color-primary-foreground: rgb(17 24 39);
+  --color-primary-hover: rgb(102 187 106);
+
+  /* Secondary Colors (Soft Orange) */
+  --color-secondary: rgb(255 171 94);
+  --color-secondary-foreground: rgb(17 24 39);
+  --color-secondary-hover: rgb(255 153 71);
+
+  /* Accent (Deep Forest) */
+  --color-accent: rgb(52 78 65);
+  --color-accent-foreground: rgb(243 244 246);
+  --color-accent-hover: rgb(27 67 50);
+
+  /* Neutrals */
+  --color-neutral: rgb(55 65 81);
+  --color-neutral-foreground: rgb(243 244 246);
+  --color-muted: rgb(55 65 81);
+  --color-muted-foreground: rgb(156 163 175);
+
+  /* Status Colors (slightly softened for dark mode) */
+  --color-success: rgb(74 222 128);
+  --color-warning: rgb(255 193 7);
+  --color-error: rgb(248 113 113);
+  --color-info: rgb(96 165 250);
+
+  /* Borders & Inputs */
+  --color-border: rgb(55 65 81);
+  --color-input: rgb(55 65 81);
+  --color-ring: rgb(129 199 132);
+
+  /* Cards & Popovers */
+  --color-card: rgb(31 41 55);
+  --color-card-foreground: rgb(243 244 246);
+  --color-popover: rgb(31 41 55);
+  --color-popover-foreground: rgb(243 244 246);
+
+  /* Dark Mode Gradient */
+  --gradient-hero: linear-gradient(135deg, rgb(129 199 132), rgb(52 78 65));
 }
 
-body {
-  margin: 0;
-  font-family: var(--font-sans);
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+.fix-alignment {
+  @apply max-w-screen-xl mx-auto px-5 lg:px-0;
 }

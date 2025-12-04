@@ -1,7 +1,7 @@
 import React from "react";
 
-const Navbar = () => {
+const Hero = () => {
   return <div></div>;
 };
 
-export default Navbar;
+export default Hero;
