@@ -11,6 +11,24 @@ exports.getAllOrders = async (req, res) => {
   res.json(orders);
 };
 
+exports.getOrdersByFoodie = async (req, res) => {
+  const { foodieId } = req.params;
+  const orders = await Order.find({ foodieId })
+    .sort({ requestedAt: -1 })
+    .populate("cookId", "fullName isVerified")
+    .populate("mealId", "name coverPhotoUrl");
+  res.json(orders);
+};
+
+exports.getOrdersByCook = async (req, res) => {
+  const { cookId } = req.params;
+  const orders = await Order.find({ cookId })
+    .sort({ requestedAt: -1 })
+    .populate("foodieId", "fullName")
+    .populate("mealId", "name coverPhotoUrl");
+  res.json(orders);
+};
+
 exports.createOrder = async (req, res) => {
   const {
     mealId,

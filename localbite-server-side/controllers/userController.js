@@ -59,4 +59,30 @@ const getUserRoleByEmail = async (req, res) => {
   }
 };
 
-module.exports = { createUser, getUserRoleByEmail, getSingleUser };
+const updateUser = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const { fullName, locationLabel, avatar } = req.body;
+
+    const user = await User.findOne({ uid });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (fullName) user.fullName = fullName;
+    if (locationLabel) user.locationLabel = locationLabel;
+    if (avatar) user.avatar = avatar;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      users: user,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Failed to update user" });
+  }
+};
+
+module.exports = { createUser, getUserRoleByEmail, getSingleUser, updateUser };

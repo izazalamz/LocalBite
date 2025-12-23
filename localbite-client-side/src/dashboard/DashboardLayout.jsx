@@ -29,7 +29,7 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
 
   const { user, signOutUser, loading } = useContext(AuthContext);
-  const { role } = useUserRole();
+  const { role, loading: roleLoading } = useUserRole();
 
   console.log("this is role", role);
 
@@ -39,10 +39,9 @@ const DashboardLayout = () => {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const linkClasses = ({ isActive }) =>
-    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-      isActive
-        ? "bg-primary/10 text-primary border-l-4 border-primary"
-        : "hover:bg-muted text-foreground/80"
+    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive
+      ? "bg-primary/10 text-primary border-l-4 border-primary"
+      : "hover:bg-muted text-foreground/80"
     }`;
 
   const handleSignOut = async () => {
@@ -50,10 +49,17 @@ const DashboardLayout = () => {
     navigate("/login");
   };
 
-  // Protect route
+  // Protect route - only allow authenticated users
   useEffect(() => {
     if (!loading && !user) navigate("/login");
   }, [user, loading, navigate]);
+
+  // Protect route - only allow cook or foodie roles to access dashboard
+  useEffect(() => {
+    if (!roleLoading && role && !["cook", "foodie"].includes(role)) {
+      navigate("/");
+    }
+  }, [role, roleLoading, navigate]);
 
   // Fetch user profile
   useEffect(() => {
@@ -65,7 +71,10 @@ const DashboardLayout = () => {
       .catch(() => setError("Failed to load user data"));
   }, [user]);
 
-  if (loading || !user) return <Loading />;
+  if (loading || roleLoading || !user) return <Loading />;
+
+  // Don't render dashboard if user is not a cook or foodie
+  if (!["cook", "foodie"].includes(role)) return null;
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -81,7 +90,7 @@ const DashboardLayout = () => {
               <Menu />
             </button>
 
-            <div className="flex items-center gap-3">
+            <NavLink to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold">
                 LB
               </div>
@@ -89,7 +98,7 @@ const DashboardLayout = () => {
                 <h1 className="text-xl font-bold">LocalBite</h1>
                 <p className="text-xs text-muted-foreground">Dashboard</p>
               </div>
-            </div>
+            </NavLink>
 
             <div className="hidden md:block relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -152,9 +161,8 @@ const DashboardLayout = () => {
       <div className="flex flex-1">
         {/* Sidebar */}
         <aside
-          className={`fixed md:relative z-40 w-64 bg-card border-r border-border p-6 transition-transform ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-          }`}
+          className={`fixed md:relative z-40 w-64 bg-card border-r border-border p-6 transition-transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+            }`}
         >
           <nav className="space-y-2">
             <NavLink to="/dashboard" end className={linkClasses}>
