@@ -33,6 +33,37 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    // Rating fields (calculated from reviews)
+    avgCookRating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    cookRatingCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    // Profile fields
+    locationLabel: {
+      type: String,
+      default: "",
+      maxlength: 160,
+    },
+    profilePhotoUrl: {
+      type: String,
+      default: "",
+    },
+
+    // Soft delete
+    isDeleted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
   { timestamps: true }
 );

@@ -13,7 +13,7 @@ import AddDish from "../dashboard/DashboardComponents/AddDish";
 import Profile from "../dashboard/DashboardComponents/Profile";
 import Orders from "../dashboard/DashboardComponents/Orders";
 import MyOrders from "../dashboard/DashboardComponents/MyOrders";
-import Community from "../dashboard/DashboardComponents/Community";
+import Insights from "../dashboard/DashboardComponents/Insights";
 import CooksReview from "../dashboard/DashboardComponents/CooksReview";
 
 
@@ -72,8 +72,8 @@ export const routes = createBrowserRouter([
         Component: MyOrders,
       },
       {
-        path: "/dashboard/community",
-        Component: Community,
+        path: "/dashboard/insights",
+        Component: Insights,
       },
       {
         path: "/dashboard/profile",

@@ -34,14 +34,14 @@ const DashboardLayout = () => {
   console.log("this is role", role);
 
   const [userData, setUserData] = useState({});
-  const [error, setError] = useState("");
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const linkClasses = ({ isActive }) =>
-    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive
-      ? "bg-primary/10 text-primary border-l-4 border-primary"
-      : "hover:bg-muted text-foreground/80"
+    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+      isActive
+        ? "bg-primary/10 text-primary border-l-4 border-primary"
+        : "hover:bg-muted text-foreground/80"
     }`;
 
   const handleSignOut = async () => {
@@ -68,7 +68,7 @@ const DashboardLayout = () => {
     axios
       .get(`http://localhost:3000/users/${user.uid}`)
       .then((res) => setUserData(res.data.user))
-      .catch(() => setError("Failed to load user data"));
+      .catch(() => console.error("Failed to load user data"));
   }, [user]);
 
   if (loading || roleLoading || !user) return <Loading />;
@@ -90,7 +90,10 @@ const DashboardLayout = () => {
               <Menu />
             </button>
 
-            <NavLink to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <NavLink
+              to="/"
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold">
                 LB
               </div>
@@ -161,8 +164,9 @@ const DashboardLayout = () => {
       <div className="flex flex-1">
         {/* Sidebar */}
         <aside
-          className={`fixed md:relative z-40 w-64 bg-card border-r border-border p-6 transition-transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-            }`}
+          className={`fixed md:relative z-40 w-64 bg-card border-r border-border p-6 transition-transform ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          }`}
         >
           <nav className="space-y-2">
             <NavLink to="/dashboard" end className={linkClasses}>
@@ -174,8 +178,8 @@ const DashboardLayout = () => {
                 <NavLink to="/dashboard/my-orders" className={linkClasses}>
                   <ShoppingBag /> My Orders
                 </NavLink>
-                <NavLink to="/dashboard/community" className={linkClasses}>
-                  <Users /> Community
+                <NavLink to="/dashboard/insights" className={linkClasses}>
+                  <Users /> Insights
                 </NavLink>
               </>
             )}
@@ -190,6 +194,9 @@ const DashboardLayout = () => {
                 </NavLink>
                 <NavLink to="/dashboard/orders" className={linkClasses}>
                   <ShoppingBag /> Orders
+                </NavLink>
+                <NavLink to="/dashboard/insights" className={linkClasses}>
+                  <Users /> Insights
                 </NavLink>
               </>
             )}
