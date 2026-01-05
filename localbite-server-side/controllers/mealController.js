@@ -82,16 +82,21 @@ exports.updateMeal = async (req, res) => {
 };
 
 exports.deleteMeal = async (req, res) => {
-  const meal = await Meal.findById(req.params.id);
-  if (!meal || meal.isDeleted)
-    return res.status(404).json({ message: "Meal not found" });
+  try {
+    const meal = await Meal.findById(req.params.id);
+    if (!meal || meal.isDeleted)
+      return res.status(404).json({ message: "Meal not found" });
 
-  meal.isDeleted = true;
-  meal.deletedAt = new Date();
-  meal.deleteReason = req.body.reason || "Removed";
+    meal.isDeleted = true;
+    meal.deletedAt = new Date();
+    meal.deleteReason = req.body?.reason || "Removed";
 
-  await meal.save();
-  res.json({ success: true });
+    await meal.save();
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Delete meal error:", error);
+    res.status(500).json({ message: "Failed to delete meal" });
+  }
 };
 
 exports.updateAvailability = async (req, res) => {

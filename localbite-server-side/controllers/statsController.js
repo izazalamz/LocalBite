@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Meal = require("../models/mealModel");
 const Order = require("../models/orderModel");
 const User = require("../models/userModel");
@@ -64,5 +65,44 @@ exports.getDashboard = async (req, res) => {
     topCooks,
     popularMeals,
     monthlyOrders,
+  });
+};
+
+exports.getCookDashboard = async (req, res) => {
+  const { cookId } = req.params;
+
+  // Active or completed
+  const activeOrdersCount = await Order.countDocuments({
+    cookId,
+    status: { $in: ["cook_confirmed", "foodie_confirmed", "confirmed"] },
+  });
+
+  const pendingRequestsCount = await Order.countDocuments({
+    cookId,
+    status: "requested",
+  });
+
+  const completedOrdersCount = await Order.countDocuments({
+    cookId,
+    status: "completed",
+  });
+
+  const totalEarnings =
+    (await Order.aggregate([
+      { $match: { cookId: new mongoose.Types.ObjectId(cookId), status: "completed" } },
+      { $group: { _id: null, total: { $sum: { $multiply: ["$quantity", "$mealSnapshot.price"] } } } },
+    ]))[0]?.total || 0;
+
+  const user = await User.findById(cookId).select(
+    "avgCookRating cookRatingCount"
+  );
+  const avgRating = user ? user.avgCookRating : 0;
+
+  res.json({
+    activeOrdersCount,
+    pendingRequestsCount,
+    completedOrdersCount,
+    totalEarnings,
+    avgRating,
   });
 };

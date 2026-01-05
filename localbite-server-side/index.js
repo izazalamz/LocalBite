@@ -1,6 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const connectDB = require("./config/db");
+const PORT = process.env.PORT || 3000;
+const userRoutes = require("./routes/userRoutes");
+const mealRoutes = require("./routes/mealRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const statsRoutes = require("./routes/statsRoutes");
 
 const app = express();
 const port = process.env.PORT || 5000; 
@@ -9,27 +15,11 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// debug
-app.use((req, res, next) => {
-  console.log(`[Server] Incoming Request: ${req.method} ${req.url}`);
-  next();
-});
-
-const reviewSchema = new mongoose.Schema({
-  cookName: { type: String, required: true },
-  user: { type: String, default: "Guest" },
-  email: { type: String }, 
-  rating: { type: Number, required: true },
-  comment: { type: String, required: true },
-}, { timestamps: true });
-
-const Review = mongoose.models.Review || mongoose.model("Review", reviewSchema);
-
-//routes
-app.get("/api/reviews/:cookName", async (req, res) => {
-  try {
-    const cookName = decodeURIComponent(req.params.cookName);
-    console.log(`[GET] Fetching reviews for: ${cookName}`);
+// Routes
+app.use(userRoutes);
+app.use("/meals", mealRoutes);
+app.use("/orders", orderRoutes);
+app.use("/api/stats", statsRoutes);
 
     const reviews = await Review.find({ 
       cookName: { $regex: new RegExp(`^${cookName}$`, "i") } 
