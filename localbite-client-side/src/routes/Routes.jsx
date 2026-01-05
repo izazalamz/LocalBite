@@ -45,10 +45,6 @@ export const routes = createBrowserRouter([
         path: "/signup",
         Component: SignUp,
       },
-      {
-        path: "/cook/:cookName", 
-        Component: CooksReview,
-      },
     ],
   },
   {
@@ -82,6 +78,10 @@ export const routes = createBrowserRouter([
       {
         path: "/dashboard/profile",
         Component: Profile,
+      },
+      {
+        path: "/dashboard/cooksreview",
+        Component: CooksReview,
       },
     ],
   },
