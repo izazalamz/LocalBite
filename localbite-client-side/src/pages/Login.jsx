@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthContext } from "../contexts/AuthContext";
@@ -9,7 +9,7 @@ const Login = () => {
     password: "",
   };
 
-  const { signInUser } = use(AuthContext);
+  const { signInUser } = useContext(AuthContext);
   const [formData, setFormData] = useState(initialForm);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();

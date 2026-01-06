@@ -9,7 +9,10 @@ const useUserRole = () => {
   const email = user?.email;
 
   useEffect(() => {
-    if (!email) return;
+    if (!email) {
+      setLoading(false);
+      return;
+    }
 
     const fetchRole = async () => {
       try {
@@ -17,9 +20,15 @@ const useUserRole = () => {
           `http://localhost:3000/users/role/${email}`
         );
 
-        setRole(res.data.role);
+        if (res.data.success && res.data.role) {
+          setRole(res.data.role);
+        } else {
+          console.warn("User role not found or invalid");
+          setRole("");
+        }
       } catch (error) {
         console.error("Failed to fetch user role:", error);
+        setRole("");
       } finally {
         setLoading(false);
       }

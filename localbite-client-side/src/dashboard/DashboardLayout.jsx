@@ -12,6 +12,9 @@ import {
   LogOut,
   ChevronDown,
   PlusSquare,
+  BarChart3,
+  Star,
+  ShieldCheck,
 } from "lucide-react";
 import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
@@ -65,10 +68,38 @@ const DashboardLayout = () => {
   useEffect(() => {
     if (!user?.uid) return;
 
-    axios
-      .get(`http://localhost:3000/users/${user.uid}`)
-      .then((res) => setUserData(res.data.user))
-      .catch(() => console.error("Failed to load user data"));
+    const fetchUserData = async () => {
+      try {
+        const res = await axios.get(`http://localhost:3000/users/${user.uid}`);
+        // Handle both user and users for backward compatibility
+        setUserData(res.data.user || res.data.users || {});
+      } catch (err) {
+        // If user doesn't exist in database, try to create them
+        if (err.response?.status === 404 && user.email) {
+          console.warn("User not found in database, attempting to create...");
+          try {
+            // Try to create user with basic info from Firebase
+            const createRes = await axios.post("http://localhost:3000/users", {
+              fullName: user.displayName || user.email.split("@")[0],
+              email: user.email,
+              role: "foodie", // Default role
+              uid: user.uid,
+            });
+            setUserData(createRes.data.user || createRes.data.users || {});
+          } catch (createErr) {
+            console.error("Failed to create user:", createErr);
+            // Set empty user data so dashboard can still work
+            setUserData({ fullName: user.displayName || user.email });
+          }
+        } else {
+          console.error("Failed to load user data:", err);
+          // Set basic user data from Firebase so dashboard can still work
+          setUserData({ fullName: user.displayName || user.email });
+        }
+      }
+    };
+
+    fetchUserData();
   }, [user]);
 
   if (loading || roleLoading || !user) return <Loading />;
@@ -80,7 +111,7 @@ const DashboardLayout = () => {
       <header className="sticky top-0 z-50 bg-card border-b border-border">
         <div className="flex items-center justify-between px-6 py-4">
           {/* Left */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 ">
             <button
               onClick={toggleSidebar}
               className="md:hidden p-2 rounded-lg hover:bg-muted z-50"
@@ -144,7 +175,7 @@ const DashboardLayout = () => {
         {/* Sidebar */}
         <aside
           className={`
-            fixed top-0 left-0 h-full w-64 bg-card border-r border-border p-6
+            fixed top-0 left-0  w-64 bg-card border-r border-border p-6 min-h-screen
             transform transition-transform duration-300 ease-in-out
             z-40
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
@@ -196,6 +227,33 @@ const DashboardLayout = () => {
                 </NavLink>
               </>
             )}
+
+            {/* Reviews - Available to all authenticated users */}
+            <NavLink
+              to="/dashboard/cooksreview"
+              className={linkClasses}
+              onClick={closeSidebar}
+            >
+              <Star /> Reviews
+            </NavLink>
+
+            {/* Insights - Visible to all dashboard users */}
+            <NavLink
+              to="/dashboard/insights"
+              className={linkClasses}
+              onClick={closeSidebar}
+            >
+              <BarChart3 /> Insights
+            </NavLink>
+
+            {/* Verification */}
+            <NavLink
+              to="/dashboard/verify"
+              className={linkClasses}
+              onClick={closeSidebar}
+            >
+              <ShieldCheck /> Verify
+            </NavLink>
 
             {role === "admin" && (
               <NavLink

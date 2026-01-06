@@ -69,40 +69,61 @@ exports.getDashboard = async (req, res) => {
 };
 
 exports.getCookDashboard = async (req, res) => {
-  const { cookId } = req.params;
+  try {
+    const { cookId } = req.params;
 
-  // Active or completed
-  const activeOrdersCount = await Order.countDocuments({
-    cookId,
-    status: { $in: ["cook_confirmed", "foodie_confirmed", "confirmed"] },
-  });
+    // Convert cookId to ObjectId for consistent querying
+    const cookObjectId = mongoose.Types.ObjectId.isValid(cookId)
+      ? new mongoose.Types.ObjectId(cookId)
+      : null;
 
-  const pendingRequestsCount = await Order.countDocuments({
-    cookId,
-    status: "requested",
-  });
+    if (!cookObjectId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid cook ID",
+      });
+    }
 
-  const completedOrdersCount = await Order.countDocuments({
-    cookId,
-    status: "completed",
-  });
+    // Active or completed
+    const activeOrdersCount = await Order.countDocuments({
+      cookId: cookObjectId,
+      status: { $in: ["cook_confirmed", "foodie_confirmed", "confirmed"] },
+    });
 
-  const totalEarnings =
-    (await Order.aggregate([
-      { $match: { cookId: new mongoose.Types.ObjectId(cookId), status: "completed" } },
-      { $group: { _id: null, total: { $sum: { $multiply: ["$quantity", "$mealSnapshot.price"] } } } },
-    ]))[0]?.total || 0;
+    const pendingRequestsCount = await Order.countDocuments({
+      cookId: cookObjectId,
+      status: "requested",
+    });
 
-  const user = await User.findById(cookId).select(
-    "avgCookRating cookRatingCount"
-  );
-  const avgRating = user ? user.avgCookRating : 0;
+    const completedOrdersCount = await Order.countDocuments({
+      cookId: cookObjectId,
+      status: "completed",
+    });
 
-  res.json({
-    activeOrdersCount,
-    pendingRequestsCount,
-    completedOrdersCount,
-    totalEarnings,
-    avgRating,
-  });
+    const totalEarnings =
+      (await Order.aggregate([
+        { $match: { cookId: cookObjectId, status: "completed" } },
+        { $group: { _id: null, total: { $sum: { $multiply: ["$quantity", "$mealSnapshot.price"] } } } },
+      ]))[0]?.total || 0;
+
+    const user = await User.findById(cookObjectId).select(
+      "avgCookRating cookRatingCount"
+    );
+    const avgRating = user ? user.avgCookRating : 0;
+
+    res.json({
+      success: true,
+      activeOrdersCount,
+      pendingRequestsCount,
+      completedOrdersCount,
+      totalEarnings,
+      avgRating,
+    });
+  } catch (error) {
+    console.error("Error fetching cook dashboard:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch cook dashboard",
+    });
+  }
 };

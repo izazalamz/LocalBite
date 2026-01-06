@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Clock, MapPin, User, X, ShoppingCart, Utensils } from "lucide-react";
+import { Clock, MapPin, User, X, ShoppingCart, Utensils, Star } from "lucide-react";
 import axios from "axios";
 import { AuthContext } from "../contexts/AuthContext";
 import { useNavigate } from "react-router";
@@ -226,11 +226,31 @@ const AllFoods = () => {
 
                   {/* Cook Info */}
                   {meal.cookId && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <User className="h-3.5 w-3.5" />
-                      <span className="line-clamp-1">
-                        {meal.cookId.fullName || "Cook"}
-                      </span>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <User className="h-3.5 w-3.5" />
+                        <span className="line-clamp-1">
+                          {meal.cookId.fullName || "Cook"}
+                        </span>
+                        {meal.cookId.isVerified && (
+                          <span className="text-primary text-[10px] font-medium">
+                            ✓ Verified
+                          </span>
+                        )}
+                      </div>
+                      {meal.avgMealRating > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3 w-3 text-warning fill-warning" />
+                          <span className="font-medium text-foreground">
+                            {meal.avgMealRating.toFixed(1)}
+                          </span>
+                          {meal.mealRatingCount > 0 && (
+                            <span className="text-muted-foreground">
+                              ({meal.mealRatingCount})
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
 

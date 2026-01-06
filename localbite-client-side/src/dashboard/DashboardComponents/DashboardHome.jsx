@@ -57,7 +57,12 @@ const DashboardHome = () => {
         const userRes = await axios.get(
           `http://localhost:3000/users/${user.uid}`
         );
-        const cookId = userRes.data.users._id;
+        // Handle both user and users for backward compatibility
+        const userData = userRes.data.user || userRes.data.users;
+        if (!userData || !userData._id) {
+          throw new Error("User data not found");
+        }
+        const cookId = userData._id;
 
         const statsRes = await axios.get(
           `http://localhost:3000/api/stats/cook/${cookId}`
@@ -65,6 +70,7 @@ const DashboardHome = () => {
         setStats(statsRes.data);
       } catch (err) {
         console.error("Failed to load stats", err);
+        setStats(null);
       } finally {
         setLoading(false);
       }

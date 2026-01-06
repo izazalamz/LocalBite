@@ -4,23 +4,52 @@ const createUser = async (req, res) => {
   try {
     const { fullName, email, role, uid } = req.body;
 
-    const user = await User.create({
-      fullName,
-      email,
-      role,
-      uid,
+    // Check if user already exists by email or uid
+    let user = await User.findOne({
+      $or: [{ email }, { uid }],
     });
+
+    if (user) {
+      // Update existing user
+      if (fullName) user.fullName = fullName;
+      if (role) user.role = role;
+      if (uid && !user.uid) user.uid = uid;
+      await user.save();
+    } else {
+      // Create new user
+      user = await User.create({
+        fullName,
+        email,
+        role: role || "foodie", // Default to foodie if not provided
+        uid,
+      });
+    }
 
     res.status(200).json({
       success: true,
       user,
+      users: user, // Backward compatibility
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error creating/updating user:", error);
+
+    // Handle duplicate email error
+    if (error.code === 11000) {
+      // Try to find and return existing user
+      const existingUser = await User.findOne({ email: req.body.email });
+      if (existingUser) {
+        return res.status(200).json({
+          success: true,
+          user: existingUser,
+          users: existingUser,
+        });
+      }
+    }
 
     res.status(500).json({
       success: false,
       message: "Failed to create or update user",
+      error: error.message,
     });
   }
 };
@@ -50,11 +79,23 @@ const getSingleUser = async (req, res) => {
   try {
     const { uid } = req.params;
     const singleUser = await User.findOne({ uid });
+    if (!singleUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
     res.status(200).json({
-      users: singleUser,
+      success: true,
+      user: singleUser,
+      users: singleUser, // Keep for backward compatibility
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching user:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch user",
+    });
   }
 };
 
@@ -68,6 +109,7 @@ const getUserRoleByEmail = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "User not found",
+        role: null,
       });
     }
 
@@ -77,7 +119,12 @@ const getUserRoleByEmail = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching user role:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch user role",
+      role: null,
+    });
   }
 };
 

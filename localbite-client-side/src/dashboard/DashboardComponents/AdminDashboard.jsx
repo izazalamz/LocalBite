@@ -58,7 +58,7 @@ const AdminDashboard = () => {
 
       setAdminStats({
         pendingRequests,
-        totalUsers: usersRes.data.users?.length || 0,
+        totalUsers: Array.isArray(usersRes.data.users) ? usersRes.data.users.length : 0,
         todayVisitors: Math.floor(Math.random() * 100) + 150, // Mock data
         revenue: 12500, // Mock data
         activeReports: 3, // Mock data
