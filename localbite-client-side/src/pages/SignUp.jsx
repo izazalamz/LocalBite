@@ -1,11 +1,11 @@
 import { Eye, EyeOff } from "lucide-react";
-import React, { use, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
 
 const SignUp = () => {
-  const { createUser, updateUser } = use(AuthContext);
+  const { createUser, updateUser } = useContext(AuthContext);
   const initialForm = {
     fullName: "",
     email: "",
@@ -30,7 +30,7 @@ const SignUp = () => {
 
       // Update user profile with display name
       await updateUser({
-        displayName: formData.fullname,
+        displayName: formData.fullName,
       });
 
       // user data for backend

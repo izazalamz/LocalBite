@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router";
 import axios from "axios";
 import { AuthContext } from "../../contexts/AuthContext";
 import Loading from "../../components/Loading";
@@ -24,6 +25,7 @@ import useVerified from "../../hooks/useVerified";
 const Profile = () => {
   const { user } = useContext(AuthContext);
   const { isVerified } = useVerified();
+  const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
@@ -318,6 +320,18 @@ const Profile = () => {
                         )}
                       </span>
                     </div>
+
+                    {/* Quick action to request verification */}
+                    {!isVerified && (
+                      <div className="mt-3">
+                        <button
+                          onClick={() => navigate("/dashboard/verify")}
+                          className="px-3 py-2 rounded-lg bg-warning/10 text-warning hover:bg-warning/20 transition"
+                        >
+                          Request Verification
+                        </button>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">
                         Account Type

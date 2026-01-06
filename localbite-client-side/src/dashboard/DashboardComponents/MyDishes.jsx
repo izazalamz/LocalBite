@@ -34,9 +34,11 @@ const MyDishes = () => {
     axios
       .get(`http://localhost:3000/users/${user.uid}`)
       .then((res) => {
-        setUserData(res.data.users);
-        if (res.data.users?._id) {
-          fetchMeals(res.data.users._id);
+        // Handle both user and users for backward compatibility
+        const userData = res.data.user || res.data.users;
+        setUserData(userData);
+        if (userData?._id) {
+          fetchMeals(userData._id);
         }
       })
       .catch((err) => {

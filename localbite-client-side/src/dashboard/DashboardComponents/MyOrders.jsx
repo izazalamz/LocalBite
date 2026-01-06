@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Utensils,
   Package,
+  Star,
 } from "lucide-react";
 import Loading from "../../components/Loading";
 
@@ -19,6 +20,11 @@ const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   // Fetch user data to get MongoDB _id (foodieId)
   useEffect(() => {
@@ -27,9 +33,11 @@ const MyOrders = () => {
     axios
       .get(`http://localhost:3000/users/${user.uid}`)
       .then((res) => {
-        setUserData(res.data.users);
-        if (res.data.users?._id) {
-          fetchOrders(res.data.users._id);
+        // Handle both user and users for backward compatibility
+        const userData = res.data.user || res.data.users;
+        setUserData(userData);
+        if (userData?._id) {
+          fetchOrders(userData._id);
         }
       })
       .catch((err) => {
@@ -66,6 +74,55 @@ const MyOrders = () => {
     } catch (error) {
       console.error("Failed to confirm order:", error);
       alert(error.response?.data?.message || "Failed to confirm order");
+    }
+  };
+
+  // Submit review for completed order
+  const handleReview = (order) => {
+    setSelectedOrder(order);
+    setReviewRating(0);
+    setReviewComment("");
+    setReviewModalOpen(true);
+  };
+
+  const submitReview = async () => {
+    if (!reviewRating || reviewRating < 1 || reviewRating > 5) {
+      alert("Please select a rating");
+      return;
+    }
+
+    if (!user?.uid) {
+      alert("You must be logged in to review");
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+      await axios.post("http://localhost:3000/reviews", {
+        orderId: selectedOrder._id,
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+        uid: user.uid,
+      });
+
+      alert("Review submitted successfully!");
+      setReviewModalOpen(false);
+      setSelectedOrder(null);
+      setReviewRating(0);
+      setReviewComment("");
+
+      // Refresh orders
+      if (userData?._id) {
+        fetchOrders(userData._id);
+      }
+    } catch (error) {
+      console.error("Failed to submit review:", error);
+      alert(
+        error.response?.data?.message ||
+          "Failed to submit review. Please try again."
+      );
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -355,9 +412,21 @@ const MyOrders = () => {
                       </div>
                     )}
                     {order.status === "completed" && (
-                      <div className="flex items-center gap-2 text-sm text-success">
-                        <Check className="w-4 h-4" />
-                        <span>Order completed!</span>
+                      <div className="flex items-center gap-2">
+                        {order.hasReview ? (
+                          <div className="flex items-center gap-2 text-sm text-success">
+                            <Star className="w-4 h-4 fill-warning text-warning" />
+                            <span>Reviewed</span>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleReview(order)}
+                            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium flex items-center justify-center gap-2 text-sm"
+                          >
+                            <Star className="w-4 h-4" />
+                            Review Meal
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -365,6 +434,87 @@ const MyOrders = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Review Modal */}
+      {reviewModalOpen && selectedOrder && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card border border-border rounded-xl p-6 max-w-md w-full shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-neutral">Review Meal</h3>
+              <button
+                onClick={() => {
+                  setReviewModalOpen(false);
+                  setSelectedOrder(null);
+                }}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <p className="font-medium text-foreground mb-2">
+                {selectedOrder.mealSnapshot?.name || "Meal"}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Order Code: {selectedOrder.orderCode}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Rating *
+                </label>
+                <select
+                  value={reviewRating}
+                  onChange={(e) => setReviewRating(Number(e.target.value))}
+                  className="w-full px-4 py-2 rounded-lg bg-muted border border-border focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                >
+                  <option value={0}>Select Rating</option>
+                  {[1, 2, 3, 4, 5].map((r) => (
+                    <option key={r} value={r}>
+                      {r} Star{r > 1 ? "s" : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Your Review (Optional)
+                </label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Share your experience..."
+                  rows="4"
+                  className="w-full px-4 py-2 rounded-lg bg-muted border border-border focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={submitReview}
+                  disabled={submittingReview || !reviewRating}
+                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submittingReview ? "Submitting..." : "Submit Review"}
+                </button>
+                <button
+                  onClick={() => {
+                    setReviewModalOpen(false);
+                    setSelectedOrder(null);
+                  }}
+                  className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

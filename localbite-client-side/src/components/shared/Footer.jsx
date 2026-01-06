@@ -29,7 +29,7 @@ const Footer = () => {
                 <li>
                   <Link
                     className="hover:text-primary transition-colors"
-                    to="/browse"
+                    to="/all-foods"
                   >
                     Browse Meals
                   </Link>
